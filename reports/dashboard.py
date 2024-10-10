@@ -50,9 +50,12 @@ with tab2:
     if youtube_url:
         # YouTube URL processing logic (dummy for now)
         st.write("Processing the YouTube video...")
-        summary = extract_transcript_from_youtube(youtube_url)
-        st.success(summary)
-
+        try: 
+            summary = extract_transcript_from_youtube(youtube_url)
+            st.success(summary)
+        except:
+            st.error("Oops! Our service is taking a quick break. Please try again later! 😥")
+        
         # Show Q&A panel after processing YouTube video
         with st.expander("Question and Answer"):
             question = st.text_input("Ask a question about the video content:")

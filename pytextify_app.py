@@ -2,8 +2,9 @@ import streamlit as st
 import streamlit_authenticator as stauth
 from sqlalchemy import create_engine
 
-
 st.set_page_config(layout="wide")
+
+from cookies_file import cookies
 
 login_page = st.Page("accounts/login.py", title="Pytextify - Log in & Sign up", icon=":material/login:")
 logout_page = st.Page("accounts/logout.py", title="Log out", icon=":material/logout:")
@@ -15,8 +16,10 @@ alerts = st.Page("reports/alerts.py", title="System alerts", icon=":material/not
 search = st.Page("tools/search.py", title="Search", icon=":material/search:")
 history = st.Page("tools/history.py", title="History", icon=":material/history:")
 
-if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+
+if cookies.get("logged_in") == "true":
+    st.session_state.logged_in = True
+else: st.session_state.logged_in = False
 
 if st.session_state.logged_in:
     pg = st.navigation(
@@ -26,7 +29,6 @@ if st.session_state.logged_in:
             "Tools": [search, history],
         }
     )
-else:
-    pg = st.navigation([login_page])
+else: pg = st.navigation([login_page])
 
 pg.run()

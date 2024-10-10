@@ -1,4 +1,6 @@
+import pytube.extract
 from youtube_transcript_api import YouTubeTranscriptApi
+import pytube
 # import gensim
 # from gensim import corpora
 
@@ -8,9 +10,12 @@ from youtube_transcript_api import YouTubeTranscriptApi
 # import nltk
 # nltk.download('stopwords')
 # nltk.download('punkt_tab')
+def get_video_id(url):
+    id = pytube.extract.video_id(url)
+    return id
 
 def extract_transcript_from_youtube(youtube_url):
-    video_id = youtube_url.split("v=")[1]  # Extract video ID from URL
+    video_id = get_video_id(youtube_url)
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
     transcript_text = "\n".join([t['text'] for t in transcript])
     return transcript_text
