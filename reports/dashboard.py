@@ -21,7 +21,7 @@ with tab1:
             f.write(uploaded_file.getbuffer())
 
         # Display the video
-        st.video("uploaded_file.mp4")  
+        st.video("assets/uploaded_file/uploaded_video.mp4")  
         st.write("Processing your file...")
 
         # Optional text area for video details or description
