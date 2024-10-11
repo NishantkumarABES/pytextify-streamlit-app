@@ -5,11 +5,12 @@ password = "3iCmIOx4j0NGJTQy"
 host = "gateway01.ap-southeast-1.prod.aws.tidbcloud.com"
 port = 4000  
 database_name = "test"
-
+connect_timeout=300 
 
 
 engine = create_engine(f"mysql+pymysql://{username}:{password}@{host}:{port}/{database_name}", 
-                       connect_args={'ssl': {'ca': 'ssl_cert.pem'}})
+                       connect_args={'ssl': {'ca': 'ssl_cert.pem'}, 'connect_timeout': 10}
+)
 
 
 
