@@ -37,9 +37,16 @@ def authenticate_user(username, password):
     return False
 
 def is_valid_email(email):
-    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
-    return re.match(pattern, email)
-
+    if '@' not in email or email.startswith('@') or email.endswith('@'):
+        return False
+    local_part, domain_part = email.split('@')
+    if not local_part or not domain_part:
+        return False
+    if '.' not in domain_part or domain_part.startswith('.') or domain_part.endswith('.'):
+        return False
+    if len(local_part) > 64 or len(domain_part) > 255:
+        return False
+    return True
 
 
 if not st.session_state.get("logged_in", False):
