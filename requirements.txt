@@ -8,3 +8,4 @@ pydub==0.25.1
 pytube==15.0.0
 streamlit-cookies-manager==0.2.0
 pymysql==1.1.1
+regex==2.5.147
