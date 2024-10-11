@@ -1,4 +1,6 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 
 username = "2Q8jvwVEw3JhUQc.root"
 password = "3iCmIOx4j0NGJTQy"
@@ -12,7 +14,8 @@ engine = create_engine(f"mysql+pymysql://{username}:{password}@{host}:{port}/{da
                        connect_args={'ssl': {'ca': 'ssl_cert.pem'}, 'connect_timeout': 10}
 )
 
-
+Session = sessionmaker(bind=engine)
+session = Session()
 
 user_table_query = """
 CREATE TABLE IF NOT EXISTS `users` (

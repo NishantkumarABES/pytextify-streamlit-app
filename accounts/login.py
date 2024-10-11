@@ -1,36 +1,34 @@
 import bcrypt
 import streamlit as st
 from cookies_file import cookies
-from TiDB_connection import engine, user_table_query, insert_user_query, fetch_username_query
+from TiDB_connection import session, user_table_query, insert_user_query, fetch_username_query
 from sqlalchemy import text
 
-with engine.connect() as connection:
-    connection.execute(text(user_table_query))
+
+session.execute(text(user_table_query))
 
 
 def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    with engine.connect() as connection:
-        connection.execute(
-            text(insert_user_query),
-            {"username": username, "name": name, "password": hashed_password, "email": email}
-        )
-        
+    session.execute(
+        text(insert_user_query),
+        {"username": username, "name": name, "password": hashed_password, "email": email}
+    )
+
+@st.cache_data     
 def check_user(username):
-    with engine.connect() as connection:
-        result = connection.execute(
-            text(fetch_username_query),
-            {"username": username}
-        )
+    result = session.execute(
+        text(fetch_username_query),
+        {"username": username}
+    )
     print("feteched user:", result.first())
     return result.first()
 
 def authenticate_user(username, password):
-    with engine.connect() as connection:
-        result = connection.execute(
-            text(fetch_username_query),
-            {"username": username}
-        )
+    result = session.execute(
+        text(fetch_username_query),
+        {"username": username}
+    )
     user = result.first()
     if user:
         return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
