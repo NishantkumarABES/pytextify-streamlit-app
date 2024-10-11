@@ -5,8 +5,15 @@ from TiDB_connection import session, user_table_query, insert_user_query, fetch_
 from sqlalchemy import text
 
 
-session.execute(text(user_table_query))
 
+try:
+    session.execute(text(user_table_query))
+    session.commit()  
+except Exception as e:
+    session.rollback() 
+    print(f"Error occurred: {e}")
+finally:
+    session.close()
 
 def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
