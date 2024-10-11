@@ -22,6 +22,7 @@ def check_user(username):
             text(fetch_username_query),
             {"username": username}
         )
+    print("feteched user:", result.first())
     return result.first()
 
 def authenticate_user(username, password):
