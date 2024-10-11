@@ -11,7 +11,8 @@ connect_timeout=300
 
 
 engine = create_engine(f"mysql+pymysql://{username}:{password}@{host}:{port}/{database_name}", 
-                       connect_args={'ssl': {'ca': 'ssl_cert.pem'}, 'connect_timeout': 10}
+                       connect_args={'ssl': {'ca': 'ssl_cert.pem'}, 'connect_timeout': 10},
+                       pool_size=10, max_overflow=20, pool_timeout=30, pool_recycle=3600
 )
 
 Session = sessionmaker(bind=engine)

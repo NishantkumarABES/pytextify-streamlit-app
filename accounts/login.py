@@ -5,7 +5,6 @@ from TiDB_connection import session, user_table_query, insert_user_query, fetch_
 from sqlalchemy import text
 
 
-
 try:
     session.execute(text(user_table_query))
     session.commit()  
