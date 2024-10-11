@@ -1,4 +1,3 @@
-import regex as re
 import bcrypt
 import streamlit as st
 from cookies_file import cookies
