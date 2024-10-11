@@ -1,40 +1,45 @@
-import sqlite3
+import regex as re
 import bcrypt
 import streamlit as st
 from cookies_file import cookies
+from TiDB_connection import engine, user_table_query, insert_user_query, fetch_username_query
+from sqlalchemy import text
+
+with engine.connect() as connection:
+    connection.execute(text(user_table_query))
 
 
-
-# Database setup
-conn = sqlite3.connect('pytextify_users.db', check_same_thread=False)
-c = conn.cursor()
-
-# Create a table to store users if it doesn't exist
-c.execute('''CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT UNIQUE,
-                name TEXT,
-                password TEXT
-            )''')
-conn.commit()
-
-def add_user(username, name, password):
+def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    c.execute('INSERT INTO users (username, name, password) VALUES (?, ?, ?)', (username, name, hashed_password))
-    conn.commit()
-
+    with engine.connect() as connection:
+        connection.execute(
+            text(insert_user_query),
+            {"username": username, "name": name, "password": hashed_password, "email": email}
+        )
+        
 def check_user(username):
-    c.execute('SELECT * FROM users WHERE username = ?', (username,))
-    return c.fetchone()
+    with engine.connect() as connection:
+        result = connection.execute(
+            text(fetch_username_query),
+            {"username": username}
+        )
+    return result.first()
 
 def authenticate_user(username, password):
-    c.execute('SELECT * FROM users WHERE username = ?', (username,))
-    user = c.fetchone()
+    with engine.connect() as connection:
+        result = connection.execute(
+            text(fetch_username_query),
+            {"username": username}
+        )
+    user = result.first()
     if user:
-        return bcrypt.checkpw(password.encode(), user[3])
+        return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
     return False
 
-# Check cookies for existing login session
+def is_valid_email(email):
+    pattern = r'^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$'
+    return re.match(pattern, email)
+
 
 
 if not st.session_state.get("logged_in", False):
@@ -49,8 +54,8 @@ if not st.session_state.get("logged_in", False):
         tab1, tab2 = st.tabs(["Login", "Sign Up"])
         with tab1:
             st.subheader("Login to PyTextify")
-            username = st.text_input("Username", key='3')
-            password = st.text_input("Password", type='password', key='4')
+            username = st.text_input("Username", key='1')
+            password = st.text_input("Password", type='password', key='2')
             
             if st.button("Login"):
                 if authenticate_user(username, password):
@@ -62,25 +67,40 @@ if not st.session_state.get("logged_in", False):
                     st.error("Incorrect username or password")
         with tab2:
             st.subheader("Create New Account")
-            new_user = st.text_input("Username", key='1')
-            name = st.text_input("Name")
-            col_left, col_right = st.columns([1, 1])
-            with col_left:
-                new_password = st.text_input("Password", type='password', key='2')
-            with col_right:
-                confirm_password = st.text_input("Confirm Password", type='password')
+            new_user = st.text_input("Username", key='3')
+            
+
+            col_left_1, col_right_1 = st.columns([1, 1])
+            with col_left_1:
+                name = st.text_input("Name", key='4')
+            with col_right_1:
+                email = st.text_input("E-mail" , key='5')
+                
+
+
+            col_left_2, col_right_2 = st.columns([1, 1])
+            with col_left_2:
+                new_password = st.text_input("Password", type='password', key='6')
+            with col_right_2:
+                confirm_password = st.text_input("Confirm Password", type='password', key='7')
+
+
             if st.button("Sign Up"):
                 if new_password == confirm_password:
-                    if check_user(new_user) is None:
-                        add_user(new_user, name, new_password)
+                    if not(email): st.error("Email field is empty.")
+                    elif not(is_valid_email(email)): st.error("Invalid email format. Please enter a valid email address.")
+                    elif not(name): st.error("Name field is empty.")
+                    elif not(new_user                                                                                                                                                                                                       ): st.error("username field is empty.")
+                    elif check_user(new_user) is None:
+                        add_user(new_user, name, new_password, email)
                         st.success("You have successfully created an account!")
-                        st.info("Go to the Login Menu to login")
+                        st.info("Go to the Login Menu to login.")
                     else:
                         st.error("Username already exists! Try a different one.")
                 else:
                     st.error("Passwords do not match")
         
-        conn.close()
+
 
 
 

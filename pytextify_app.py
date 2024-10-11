@@ -1,7 +1,4 @@
 import streamlit as st
-import streamlit_authenticator as stauth
-from sqlalchemy import create_engine
-
 st.set_page_config(layout="wide")
 
 from cookies_file import cookies
