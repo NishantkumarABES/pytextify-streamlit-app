@@ -10,7 +10,7 @@ from sqlalchemy import text
 def create_user_table():
     with session.begin():
         session.execute(text(user_table_query))  # No need to close result explicitly
-create_user_table()
+# create_user_table()
 
 # Function to add a new user
 def add_user(username, name, password, email):
