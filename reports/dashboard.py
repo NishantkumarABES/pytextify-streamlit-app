@@ -1,6 +1,7 @@
 import streamlit as st
 from video_to_text import video_to_text
 from utility_functions import extract_transcript_from_youtube
+import time
 
 st.image(r"assets/images/logo_path.png", width=150)
 st.title("Welcome to PyTextify")
