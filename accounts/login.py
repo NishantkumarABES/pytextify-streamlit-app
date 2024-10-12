@@ -6,36 +6,38 @@ from sqlalchemy import text
 
 
 
-create_user_table = session.execute(text(user_table_query))
-# create_user_table.commit()  
-create_user_table.close()
+# Creating user table
+def create_user_table():
+    with session.begin():
+        session.execute(text(user_table_query))  # No need to close result explicitly
+create_user_table()
 
+# Function to add a new user
 def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    insert = session.execute(
-        text(insert_user_query),
-        {"username": username, "name": name, "password": hashed_password, "email": email}
-    )
-    # insert.commit()
-    insert.close()
+    with session.begin():
+        session.execute(
+            text(insert_user_query),
+            {"username": username, "name": name, "password": hashed_password, "email": email}
+        )  
 
-@st.cache_data     
 def check_user(username):
-    result = session.execute(
-        text(fetch_username_query),
-        {"username": username}
-    )
-    row = result.first()
-    result.close()
+    with session.begin():
+        result = session.execute(
+            text(fetch_username_query),
+            {"username": username}
+        )
+        row = result.first()  # Fetch the first row
     return row
 
+# Authenticating a user
 def authenticate_user(username, password):
-    result = session.execute(
-        text(fetch_username_query),
-        {"username": username}
-    )
-    user = result.first()
-    result.close()
+    with session.begin():
+        result = session.execute(
+            text(fetch_username_query),
+            {"username": username}
+        )
+        user = result.first()  
     if user:
         return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
     return False
