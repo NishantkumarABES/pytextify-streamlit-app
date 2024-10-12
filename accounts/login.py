@@ -16,10 +16,11 @@ finally:
 
 def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
-    session.execute(
+    insert = session.execute(
         text(insert_user_query),
         {"username": username, "name": name, "password": hashed_password, "email": email}
     )
+    insert.close()
 
 @st.cache_data     
 def check_user(username):
@@ -27,8 +28,9 @@ def check_user(username):
         text(fetch_username_query),
         {"username": username}
     )
-    print("feteched user:", result.first())
-    return result.first()
+    row = result.first()
+    result.close()
+    return row
 
 def authenticate_user(username, password):
     result = session.execute(
@@ -36,6 +38,7 @@ def authenticate_user(username, password):
         {"username": username}
     )
     user = result.first()
+    result.close()
     if user:
         return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
     return False
