@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 
 create_user_table = session.execute(text(user_table_query))
-create_user_table.commit()  
+# create_user_table.commit()  
 create_user_table.close()
 
 def add_user(username, name, password, email):
@@ -16,7 +16,7 @@ def add_user(username, name, password, email):
         text(insert_user_query),
         {"username": username, "name": name, "password": hashed_password, "email": email}
     )
-    insert.commit()
+    # insert.commit()
     insert.close()
 
 @st.cache_data     
