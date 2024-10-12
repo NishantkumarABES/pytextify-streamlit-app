@@ -31,8 +31,13 @@ with tab1:
             st.write("Video Description: ", video_description)
 
         # Process the video and generate a summary
-        summary = video_to_text("assets/uploaded_file/uploaded_video.mp4")  # Function to convert video to text and summarize
-        st.success(summary)
+        summary = video_to_text("assets/uploaded_file/uploaded_video.mp4") # Function to convert video to text and summarize
+        def stream_data():
+            for word in summary.split(" "):
+                yield word + " "
+                time.sleep(0.02)
+        st.write_stream(stream_data)
+        #st.success(summary)
 
         # Show Q&A panel after file upload
         with st.expander("Question and Answer"):
