@@ -59,7 +59,8 @@ with tab2:
         try: 
             summary = extract_transcript_from_youtube(youtube_url)
             st.success(summary)
-        except:
+        except Exception as E:
+            st.write("Error message:", E)
             st.error("Oops! Our service is taking a quick break. Please try again later! 😥")
         
         # Show Q&A panel after processing YouTube video
