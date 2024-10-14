@@ -4,8 +4,6 @@ from cookies_file import cookies
 from TiDB_connection import session, user_table_query, insert_user_query, fetch_username_query
 from sqlalchemy import text
 
-
-
 # Creating user table
 def create_user_table():
     with session.begin():
@@ -107,6 +105,7 @@ if not st.session_state.get("logged_in", False):
                     elif check_user(new_user) is None:
                         add_user(new_user, name, new_password, email)
                         st.success("You have successfully created an account!")
+                        col_left_3, col_right_3 = st.columns([1, 1])
                         st.info("Go to the Login Menu to login.")
                     else:
                         st.error("Username already exists! Try a different one.")
