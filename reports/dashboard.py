@@ -56,8 +56,6 @@ with tab1:
             save_file(transcription)
         
         
-        
-
 # Tab 2: YouTube Link
 with tab2:
     st.subheader("Enter YouTube Video URL for Transcription & Summarization")
