@@ -1,6 +1,7 @@
 streamlit==1.39.0
 moviepy==1.0.3
 SQLAlchemy==2.0.35
+bcrypt==4.2.0
 youtube-transcript-api==0.6.2
 SpeechRecognition==3.10.4
 pydub==0.25.1
