@@ -1,8 +1,12 @@
 import bcrypt
+import json
 import streamlit as st
 from cookies_file import cookies
+from utility_functions import is_valid_email
 from TiDB_connection import session, user_table_query, insert_user_query, fetch_username_query
 from sqlalchemy import text
+
+user_info = dict()
 
 # Creating user table
 def create_user_table():
@@ -36,21 +40,14 @@ def authenticate_user(username, password):
             {"username": username}
         )
         user = result.first()  
+    user_info["username"] = user[1]
+    user_info["name"] = user[2]
+    user_info["email"] = user[4]
     if user:
         return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
     return False
 
-def is_valid_email(email):
-    if '@' not in email or email.startswith('@') or email.endswith('@'):
-        return False
-    local_part, domain_part = email.split('@')
-    if not local_part or not domain_part:
-        return False
-    if '.' not in domain_part or domain_part.startswith('.') or domain_part.endswith('.'):
-        return False
-    if len(local_part) > 64 or len(domain_part) > 255:
-        return False
-    return True
+
 
 
 if not st.session_state.get("logged_in", False):
@@ -71,6 +68,10 @@ if not st.session_state.get("logged_in", False):
             if st.button("Login"):
                 if authenticate_user(username, password):
                     st.session_state.logged_in = True
+                    user_info['password'] = password
+                    json_obj = json.dumps(user_info, indent=4)
+                    with open(r"assets\user_info.json", "w") as json_file:
+                        json_file.write(json_obj)
                     cookies["logged_in"] = "true"  
                     cookies.save()
                     st.rerun()  

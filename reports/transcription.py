@@ -21,4 +21,4 @@ if transcription:
         mime="text/plain"
     )
 else:
-    st.error("Now Transcription is avaliable.")
+    st.error("No Transcription is avaliable.")
