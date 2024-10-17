@@ -1,6 +1,8 @@
 import json
 import streamlit as st
 from utility_functions import is_valid_email
+from TiDB_connection import session, update_both, update_email, update_name
+from sqlalchemy import text
 
 with open(r"assets\user_info.json", 'r') as json_file:
     user_data = json.load(json_file)
@@ -18,9 +20,25 @@ def edit_profile_info(name):
     if st.button("Submit"):
         if is_valid_email(new_email):
             if password == user_data["password"]:
-                st.rerun()
+                if new_email and new_name: 
+                    with session.begin():
+                        session.execute(text(update_both), 
+                                        {"username": name, "name": new_name,"email": new_email})
+                elif new_email: 
+                    with session.begin():
+                        session.execute(text(update_email),
+                                        {"username": name,"email": new_email})
+                elif new_name: 
+                    with session.begin():
+                        session.execute(text(update_name),
+                                        {"username": name, "name": new_name})
+                st.info("Logout and then login again for visible changes.")
             else: st.error("Incorrect Password")
         else: st.error("Invalid Email")
+
+
+
+
 
 
 st.title("User Profile")

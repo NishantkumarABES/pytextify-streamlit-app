@@ -1,5 +1,7 @@
-from pytube import extract
+from pytube import extract, YouTube
 from youtube_transcript_api import YouTubeTranscriptApi
+import streamlit as st
+from cookies_file import cookies
 # import gensim
 # from gensim import corpora
 
@@ -9,15 +11,32 @@ from youtube_transcript_api import YouTubeTranscriptApi
 # import nltk
 # nltk.download('stopwords')
 # nltk.download('punkt_tab')
+
 def get_video_id(url):
     return extract.video_id(url)
 
 def extract_transcript_from_youtube(youtube_url):
     video_id = get_video_id(youtube_url)
+    print("ID:",video_id)
     transcript = YouTubeTranscriptApi.get_transcript(video_id)
     transcript_text = "\n".join([t['text'] for t in transcript])
     return transcript_text
 
+def download_youtube_video(url, save_path='assets\youtube_video'):
+    try:
+        yt = YouTube(url)
+        video_stream = yt.streams.get_lowest_resolution()
+        title = yt.title
+        print(f"Downloading: {title}")
+        video_stream.download(output_path=save_path)
+        print(f"Download completed. Video saved to: {save_path}")
+        return yt.title
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+    
+    
 
 
 def topic_modelling(structured_text):
@@ -45,3 +64,5 @@ def is_valid_email(email):
     if len(local_part) > 64 or len(domain_part) > 255:
         return False
     return True
+
+

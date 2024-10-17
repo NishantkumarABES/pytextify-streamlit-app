@@ -43,3 +43,20 @@ INSERT INTO users (username, name, password, email) VALUES (:username, :name, :p
 fetch_username_query = """
 SELECT * FROM users WHERE username = :username
 """
+update_both = """
+UPDATE users 
+SET name = :name, email = :email 
+WHERE username = :username
+"""
+
+update_name = """
+UPDATE users 
+SET name = :name 
+WHERE username = :username
+"""
+
+update_email = """
+UPDATE users 
+SET email = :email 
+WHERE username = :username
+"""
