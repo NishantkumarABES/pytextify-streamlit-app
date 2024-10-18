@@ -1,12 +1,21 @@
+import json
+import time
+import docx
 import streamlit as st
 from video_to_text import video_to_text
 from utility_functions import download_youtube_video
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
+from TiDB_connection import session, update_uploads
 from llm_modal import generate_documnet
+from sqlalchemy import text
 from pypdf import PdfReader
-import time
-import docx
+
+
+
+with open(r"assets\user_info.json", 'r') as json_file:
+    user_data = json.load(json_file)
+
 
 def english_to_hindi(text):
     hindi_text = transliterate(text, sanscript.ITRANS, sanscript.DEVANAGARI)
@@ -86,7 +95,7 @@ with tab1:
                     st.write_stream(stream_data)
                 st.session_state.document = document
             build_document(total_content)
-
+        
 
         if file_name.endswith('.pdf'):
             with open("assets/uploaded_file/uploaded_file.pdf", "wb") as f:
@@ -108,6 +117,9 @@ with tab1:
                     st.write_stream(stream_data)
                 st.session_state.document = document
             build_document(total_content)
+        
+        with session.begin():
+            session.execute(text(update_uploads),{"username": user_data['username']})
 
 
     if st.session_state.document and not(uploaded_file):
@@ -116,10 +128,6 @@ with tab1:
         if st.button("Remove Document"):
             st.session_state.document = None
             st.rerun()
-
-    
-
-        
 
 # Tab 2: YouTube Link
 with tab2:

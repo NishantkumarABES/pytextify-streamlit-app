@@ -60,3 +60,9 @@ UPDATE users
 SET email = :email 
 WHERE username = :username
 """
+
+update_uploads = """
+UPDATE users
+SET uploads = IFNULL(uploads, 0) + 1
+WHERE username = :username;
+"""
