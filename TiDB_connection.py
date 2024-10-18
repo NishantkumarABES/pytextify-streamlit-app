@@ -63,6 +63,6 @@ WHERE username = :username
 
 update_uploads = """
 UPDATE users
-SET uploads = IFNULL(uploads, 0) + 1
+SET uploads = COALESCE(uploads, 0) + 1
 WHERE username = :username;
 """
