@@ -34,6 +34,9 @@ with tab1:
     st.subheader("Upload Files for Transcription & Summarization")
     uploaded_file = st.file_uploader("Choose a video, PDF, and DOCX", type=["mp4", "pdf", "docx"])
     if uploaded_file is not None:
+        with session.begin():
+            session.execute(text(update_uploads),{"username": user_data['username']})
+            
         file_name = uploaded_file.name
         if file_name.endswith(".mp4"):
             with open("assets/uploaded_file/uploaded_video.mp4", "wb") as f:
@@ -118,8 +121,7 @@ with tab1:
                 st.session_state.document = document
             build_document(total_content)
         
-        with session.begin():
-            session.execute(text(update_uploads),{"username": user_data['username']})
+        
 
 
     if st.session_state.document and not(uploaded_file):
