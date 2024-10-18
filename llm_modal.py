@@ -1,4 +1,4 @@
-input_text = """
+input_text_video = """
 PROMPT: 
 You are tasked withconverting a transcript of a multi-speaker discussion or a single speaker into a well-structured and detailed document.
 The conversation may include multiple topics, different opinions, and varied levels of detail. The goal is to transform the raw conversation into
@@ -29,9 +29,36 @@ Organize the summaries in a way that flows logically and highlights the most imp
 
 TRANSCRIPT:
 """
+
+input_text = """
+Prompt:
+
+"Summarize the contents of the uploaded file. 
+The file may be in PDF or DOC format and contains structured information or textual content, 
+including paragraphs, bullet points, tables, or images. Break down the key points, insights, 
+and important details clearly and concisely. Provide a summary that covers the following aspects:
+
+1. Main Topics or Themes – Highlight the major themes or topics covered in the document.
+2. Key Findings or Insights – Extract any essential findings or insights from the text.
+3. Summary of Sections – Briefly summarize each section or chapter (if applicable).
+4. Notable Quotes or Statements – Include any important quotes or key statements made in the document.
+5. Actionable Items (if any) – Identify any steps, recommendations, or actions suggested in the text.
+6. Ensure the summary is precise and reflects the structure of the original document, maintaining the logical flow of information."
+
+DOCUMENT:
+
+"""
+
+
+
+
+
+
 import google.generativeai as genai
 
 genai.configure(api_key="AIzaSyCBpgo3aO4hYBbGjG2ULR0eZ2kY2G740wU")
 model = genai.GenerativeModel("gemini-1.5-flash")
-def generate_documnet(text):
-    return model.generate_content(input_text + text)
+def generate_documnet(text, type):
+   if type == "video":
+      return model.generate_content(input_text_video + text)
+   else: return model.generate_content(input_text + text)
