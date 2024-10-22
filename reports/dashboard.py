@@ -36,8 +36,13 @@ with tab1:
     if uploaded_file is not None:
         with session.begin():
             session.execute(text(update_uploads),{"username": user_data['username']})
-            
+
         file_name = uploaded_file.name
+        user_data["file_name"] = file_name
+        json_obj = json.dumps(user_data, indent=4)
+        with open(r"assets\user_info.json", "w") as json_file:
+            json_file.write(json_obj)
+
         if file_name.endswith(".mp4"):
             with open("assets/uploaded_file/uploaded_video.mp4", "wb") as f:
                 f.write(uploaded_file.getbuffer())
@@ -87,6 +92,9 @@ with tab1:
                 full_text.append(paragraph.text)
     
             total_content =  '\n'.join(full_text)
+            with open("assets/uploaded_file/document.txt", "w") as f:
+                f.write(total_content)
+
             def build_document(content):
                 st.info("Generating your document.")
                 document = generate_documnet(content, None).text
@@ -109,6 +117,9 @@ with tab1:
             for page in reader.pages:
                 total_content += page.extract_text()
             
+            with open("assets/uploaded_file/pdf.txt", "w") as f:
+                f.write(total_content)
+
             def build_document(content):
                 st.info("Generating your document.")
                 document = generate_documnet(content, None).text

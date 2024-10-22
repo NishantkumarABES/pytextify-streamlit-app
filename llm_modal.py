@@ -1,3 +1,8 @@
+import json
+
+with open(r"assets\user_info.json", 'r') as json_file:
+   user_data = json.load(json_file)
+
 input_text_video = """
 PROMPT: 
 You are tasked withconverting a transcript of a multi-speaker discussion or a single speaker into a well-structured and detailed document.
@@ -48,9 +53,30 @@ and important details clearly and concisely. Provide a summary that covers the f
 DOCUMENT:
 
 """
+def build_prompt(data, query):
+   input_text_chat = f"""
+   You are an AI assistant tasked with analyzing the following transcription or document. 
+   Carefully study the content and provide a well-structured response to the user's query based on 
+   the information present. Ensure your response is accurate, concise, and relevant to the query. 
+   Here is the transcription/document:
 
+   {data}
 
+   Now, respond to the user's query:
 
+   {query}
+
+   Generate a detailed response, referencing key points from the document where applicable.
+   """
+   return input_text_chat
+
+def get_data(file_name):
+   if file_name.endswith(".mp4"):
+      data =  open("assets/transcription/text.txt", "r", encoding='utf-8').read()
+   elif file_name.endswith(".docx"):
+      data = open("assets/uploaded_file/document.txt", "r", encoding='utf-8').read()
+   else: data = open("assets/uploaded_file/pdf.txt", "r", encoding='utf-8').read()
+   return data
 
 
 
@@ -61,4 +87,10 @@ model = genai.GenerativeModel("gemini-1.5-flash")
 def generate_documnet(text, type):
    if type == "video":
       return model.generate_content(input_text_video + text)
+   elif type == 'chat':
+      file_name = user_data.get("file_name")
+      if file_name:
+         data = get_data(file_name)
+         return model.generate_content(build_prompt(data, text))
+      return None
    else: return model.generate_content(input_text + text)

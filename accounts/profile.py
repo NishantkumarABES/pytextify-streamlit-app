@@ -24,20 +24,25 @@ def edit_profile_info(name):
                     with session.begin():
                         session.execute(text(update_both), 
                                         {"username": name, "name": new_name,"email": new_email})
+                    user_data["name"] = new_name
+                    user_data["email"] = new_email
                 elif new_email: 
                     with session.begin():
                         session.execute(text(update_email),
                                         {"username": name,"email": new_email})
+                    user_data["email"] = new_email
                 elif new_name: 
                     with session.begin():
                         session.execute(text(update_name),
                                         {"username": name, "name": new_name})
-                st.info("Logout and then login again for visible changes.")
+                    user_data["name"] = new_name
+                json_obj = json.dumps(user_data, indent=4)
+                with open(r"assets\user_info.json", "w") as json_file:
+                    json_file.write(json_obj)
+
+                st.success("User Changes are successful.")
             else: st.error("Incorrect Password")
         else: st.error("Invalid Email")
-
-
-
 
 
 
