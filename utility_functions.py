@@ -1,50 +1,4 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service 
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-import time
-def initialize_driver(CHROMEDRIVER_PATH, headless = True):
-    chrome_options = Options()
-    if headless: chrome_options.add_argument('--headless')  
-    service = Service(CHROMEDRIVER_PATH)
-    driver = webdriver.Chrome(service=service, options=chrome_options)
-    return driver
-
-
-def get_transcriptions(driver, video_url,  button1_xpath, button2_xpath, title_xpath):
-    driver.get(video_url)
-    time.sleep(5)
-    video_title = driver.find_element(By.XPATH, title_xpath).text
-    time.sleep(2)
-    driver.find_element(By.XPATH, button1_xpath).click()
-    time.sleep(2)
-    driver.find_element(By.XPATH, button2_xpath).click()
-    time.sleep(2)
-    transcript, index = '', 1
-    while True:
-        transcript_xpath = f'//*[@id="segments-container"]/ytd-transcript-segment-renderer[{index}]/div/yt-formatted-string'
-        try: sentence = driver.find_element(By.XPATH, transcript_xpath).text
-        except: break
-        transcript = transcript + sentence + '\n'
-        index = index + 1
-    driver.quit()
-    return transcript, video_title  
-
-
-title_xpath = '//*[@id="title"]/h1/yt-formatted-string'
-more_xpath = '//*[@id="expand"]'
-show_transcript_xpath = '//*[@id="primary-button"]/ytd-button-renderer/yt-button-shape/button/yt-touch-feedback-shape/div/div[2]'
-CHROMEDRIVER_PATH = r'selenium\chromedriver.exe'
-driver = initialize_driver(CHROMEDRIVER_PATH, headless=True)
-
-video_url = "https://www.youtube.com/watch?v=x6TsR3y5Qfg"
-transcription, video_title = get_transcriptions(driver, video_url, more_xpath, show_transcript_xpath, title_xpath)
-
-with open(f"transcription.txt", "w") as file:
-    file.write(f"Video Title: {video_title}\n\n")
-    file.write(f"Transcription:\n")
-    file.write(transcription)
-
+import requests
 
 def is_valid_email(email):
     if '@' not in email or email.startswith('@') or email.endswith('@'):
@@ -59,3 +13,17 @@ def is_valid_email(email):
     return True
 
 
+def fetch_transcript(video_url):
+    url = "http://127.0.0.1:5000/fetch_transcript"  # Replace with your Flask app's URL if different
+    data = {'video_url': video_url}
+    
+    try:
+        response = requests.post(url, data=data)
+        response.raise_for_status()  # Raises an error for HTTP codes 4xx/5xx
+        result = response.json()  # Parse the response JSON
+        return result
+        # print("Video Title:", result['video_title'])
+        # print("\nTranscription:\n", result['transcription'])
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching transcript: {e}")

@@ -3,7 +3,7 @@ import time
 import docx
 import streamlit as st
 from video_to_text import video_to_text
-from utility_functions import extract_transcript_from_youtube
+from utility_functions import fetch_transcript
 from indic_transliteration import sanscript
 from indic_transliteration.sanscript import transliterate
 from TiDB_connection import session, update_uploads
@@ -20,6 +20,11 @@ with open("assets/user_info.json", 'r') as json_file:
 def english_to_hindi(text):
     hindi_text = transliterate(text, sanscript.ITRANS, sanscript.DEVANAGARI)
     return hindi_text
+
+def save_file(transcription):
+    transcription_file = open("assets/transcription/text.txt", "w", encoding='utf-8')
+    transcription_file.write(transcription)
+    st.success("Your transcription is now available")
 
 st.image(r"assets/images/logo_path.png", width=150)
 st.title("Welcome to PyTextify")
@@ -53,11 +58,6 @@ with tab1:
                 ['English', "Hindi"],
                 index=None,
             )
-
-            def save_file(transcription):
-                transcription_file = open("assets/transcription/text.txt", "w", encoding='utf-8')
-                transcription_file.write(transcription)
-                st.success("Your transcription is now available")
 
             def build_document(transcription):
                 st.info("Generating your document.")
@@ -148,11 +148,25 @@ with tab2:
     youtube_url = st.text_input("YouTube Video URL")
 
     if youtube_url:
-        st.write("Processing the YouTube video...")
+        info_msg = st.info("Processing the YouTube video...")
         try: 
-            transcript = extract_transcript_from_youtube(youtube_url)
-            st.write(transcript)
+            result = fetch_transcript(youtube_url)
+            transcript = result["transcription"]
+            save_file(transcript)
+            title = result["video_title"]
+            info_msg.empty()
+            info_msg = st.info("Convert the transcript to documentation.")
+            content = "video title:" + title + "\n\n" + "transcript:\n" + transcript
+            document = generate_documnet(content, None).text
+            info_msg.empty()
+            def stream_data():
+                for word in document.split(" "):
+                    yield word + " "
+                    time.sleep(0.02)
+            with st.container(border=True):
+                st.write_stream(stream_data)
         except Exception as E:
+            print("error message:", E)
             st.error("Oops! Our service is taking a quick break. Please try again later! 😥")
 
 # Footer or additional info
