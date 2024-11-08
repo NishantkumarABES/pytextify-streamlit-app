@@ -16,8 +16,8 @@ def video_to_audio(video_path, audio_path):
 def split_audio_by_duration(audio_path, chunk_duration_ms=30000):
     audio = AudioSegment.from_wav(audio_path)
     # Calculate the number of chunks
-
-    chunk_path = "chunks"
+   
+    chunk_path = "assets/chunks"
     total_duration_ms = len(audio)  # Total duration in milliseconds
     num_chunks = math.ceil(total_duration_ms / chunk_duration_ms)  # Number of chunks
     chunks = []
@@ -51,7 +51,7 @@ def audio_to_text(audio_chunk):
 
 # Function to convert video to text (processing smaller chunks of audio in threads)
 def video_to_text(video_path, chunk_duration_ms=30000):
-    if not (os.path.exists("chunks")): os.mkdir("chunks")
+    if not(os.path.exists("assets/chunks")): os.mkdir("assets/chunks")
     # Step 1: Convert video to audio
     audio_path = video_path[:-4] + ".wav"
     video_to_audio(video_path, audio_path)
@@ -65,7 +65,7 @@ def video_to_text(video_path, chunk_duration_ms=30000):
         chunk_texts = list(executor.map(audio_to_text, chunks))
     full_text = " ".join(chunk_texts)
 
-    chunk_path = "chunks"
+    chunk_path = "assets/chunks"
     for chunk_file in os.listdir(chunk_path):
         os.remove(chunk_path + "/" + chunk_file)
     os.remove(audio_path)
