@@ -10,4 +10,4 @@ indic-transliteration==2.3.68
 google-generativeai==0.8.3
 pypdf==5.0.1
 python-docx==1.1.2
-selenium==4.31.1
+selenium==4.26.1
