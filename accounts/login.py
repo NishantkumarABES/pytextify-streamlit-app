@@ -40,10 +40,11 @@ def authenticate_user(username, password):
             {"username": username}
         )
         user = result.first()  
-    user_info["username"] = user[1]
-    user_info["name"] = user[2]
-    user_info["email"] = user[4]
+    
     if user and bcrypt.checkpw(password.encode(), user[3].encode('utf-8')):
+        user_info["username"] = user[1]
+        user_info["name"] = user[2]
+        user_info["email"] = user[4]
         user_data = {
             "username": user[1],
             "name": user[2],
