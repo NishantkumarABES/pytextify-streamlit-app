@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `users` (
 """
 
 insert_user_query = """
-INSERT INTO users (username, name, password, email) VALUES (:username, :name, :password, :email)
+INSERT INTO users (username, name, password, email, uploads) VALUES (:username, :name, :password, :email, uploads)
 """
 fetch_username_query = """
 SELECT * FROM users WHERE username = :username

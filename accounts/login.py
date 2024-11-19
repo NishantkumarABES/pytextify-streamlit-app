@@ -1,7 +1,7 @@
 import bcrypt
 import json
 import streamlit as st
-from cookies_file import cookies
+from cookies_file import cookies, generate_session_id
 from utility_functions import is_valid_email
 from TiDB_connection import session, user_table_query, insert_user_query, fetch_username_query
 from sqlalchemy import text
@@ -20,7 +20,7 @@ def add_user(username, name, password, email):
     with session.begin():
         session.execute(
             text(insert_user_query),
-            {"username": username, "name": name, "password": hashed_password, "email": email}
+            {"username": username, "name": name, "password": hashed_password, "email": email, "uploads": 0}
         )  
 
 def check_user(username):
@@ -43,8 +43,20 @@ def authenticate_user(username, password):
     user_info["username"] = user[1]
     user_info["name"] = user[2]
     user_info["email"] = user[4]
-    if user:
-        return bcrypt.checkpw(password.encode(), user[3].encode('utf-8'))
+    if user and bcrypt.checkpw(password.encode(), user[3].encode('utf-8')):
+        user_data = {
+            "username": user[1],
+            "name": user[2],
+            "email": user[4]
+        }
+        # Generate unique session ID
+        session_id = generate_session_id()
+        # Store in server-side session state
+        st.session_state.active_sessions[session_id] = user_data
+        # Store only session ID in cookie
+        cookies["session_id"] = session_id
+        cookies.save()
+        return user_data
     return False
 
 

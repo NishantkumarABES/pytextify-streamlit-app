@@ -1,7 +1,14 @@
 import streamlit as st
 st.set_page_config(layout="wide")
 
-from cookies_file import cookies
+from cookies_file import cookies, init_session
+init_session()
+
+def check_auth():
+    user_session = cookies.get("session_id")
+    if user_session and user_session in st.session_state.active_sessions:
+        return st.session_state.active_sessions[user_session]
+    return None
 
 login_page = st.Page("accounts/login.py", title="Pytextify - Log in & Sign up", icon=":material/login:")
 logout_page = st.Page("accounts/logout.py", title="Log out", icon=":material/logout:")
@@ -15,10 +22,9 @@ chat = st.Page("reports/chat.py", title="Chats", icon=":material/chat:")
 search = st.Page("tools/pyimageify.py", title="PyImageify", icon=":material/search:")
 history = st.Page("tools/pydataify.py", title="PyDataify", icon=":material/history:")
 
-
-if cookies.get("logged_in") == "true":
+user_data = check_auth()
+if user_data:
     st.session_state.logged_in = True
-
 else: st.session_state.logged_in = False
 
 if st.session_state.logged_in:
