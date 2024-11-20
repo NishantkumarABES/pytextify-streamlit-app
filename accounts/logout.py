@@ -7,7 +7,7 @@ def logout():
         session_id = cookies.get("session_id")
         if session_id in st.session_state.active_sessions:
             del st.session_state.active_sessions[session_id]
-        cookies["session_id"] = None
+        cookies["session_id"] = str(session_id) + "_inactive"
     st.session_state.logged_in = False
     cookies.save()
     st.rerun()
