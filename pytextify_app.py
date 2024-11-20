@@ -2,8 +2,9 @@ import streamlit as st
 st.set_page_config(layout="wide")
 
 from cookies_file import cookies, init_session
+print("Loading cookies")
 init_session()
-
+print("Loading session")
 def check_auth():
     user_session = cookies.get("session_id")
     if user_session and user_session in st.session_state.active_sessions:
@@ -26,6 +27,7 @@ user_data = check_auth()
 if user_data:
     st.session_state.logged_in = True
 else: st.session_state.logged_in = False
+
 
 if st.session_state.logged_in:
     pg = st.navigation(
