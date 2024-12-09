@@ -1,4 +1,4 @@
-import requests
+import sys
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -53,3 +53,13 @@ def fetch_transcript(video_url):
     
     return {'video_title': video_title,'transcription': transcript}
 
+def log_errors(inner):
+    def wrapper(*args, **kwargs):
+        try:
+            return inner(*args, **kwargs)
+        except Exception as E:
+            ex_type, ex_val, ex_tb = sys.exc_info()
+            print(f"An error occurred: {ex_type}, {ex_tb}")
+            message = f"{ex_val}, in the function: {inner.__name__}"
+            raise Exception(f"ERROR : {message}, {E}")
+    return wrapper

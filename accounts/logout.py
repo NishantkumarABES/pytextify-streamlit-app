@@ -11,6 +11,7 @@ def logout():
         cookies["session_id"] = ""
     # Update session state to indicate logged-out status
     st.session_state.logged_in = False
+    cookies["logged_in"] = 'false' 
     cookies.save()  # Save cookies after changes
     st.rerun()  # Refresh the app to apply changes
 

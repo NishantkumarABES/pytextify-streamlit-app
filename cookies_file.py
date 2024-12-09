@@ -1,15 +1,3 @@
-# from streamlit_cookies_manager import EncryptedCookieManager
-# import streamlit as st
-
-
-# cookies = EncryptedCookieManager(
-#     prefix="pytextify_",  # Prefix for cookie name
-#     password= st.secrets["cookies_password"], # Password
-# )
-# if not cookies.ready():
-#     st.stop()
-
-
 from streamlit_cookies_manager import EncryptedCookieManager
 import streamlit as st
 import uuid
@@ -30,3 +18,5 @@ def generate_session_id():
 def init_session():
     if "active_sessions" not in st.session_state:
         st.session_state["active_sessions"] = {}
+    return st.session_state["active_sessions"]
+

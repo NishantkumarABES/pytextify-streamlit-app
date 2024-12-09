@@ -1,13 +1,13 @@
 import bcrypt
 import json
 import streamlit as st
+from utility_functions import log_errors
 from cookies_file import cookies, generate_session_id, init_session
 from utility_functions import is_valid_email
 from TiDB_connection import session, user_table_query, insert_user_query, fetch_username_query
 from sqlalchemy import text
 
-# Initialize session state
-init_session()
+
 
 user_info = {}
 
@@ -17,6 +17,7 @@ def create_user_table():
         session.execute(text(user_table_query))
 
 # Add a new user
+@log_errors
 def add_user(username, name, password, email):
     hashed_password = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     with session.begin():
@@ -26,6 +27,7 @@ def add_user(username, name, password, email):
         )
 
 # Check if user exists
+@log_errors
 def check_user(username):
     with session.begin():
         result = session.execute(
@@ -35,6 +37,8 @@ def check_user(username):
         return result.first()
 
 # Authenticate user
+Login_attempt = False
+@log_errors
 def authenticate_user(username, password):
     with session.begin():
         result = session.execute(
@@ -74,7 +78,7 @@ if not st.session_state.get("logged_in", False):
                 with open("assets/user_info.json", "w") as json_file:
                     json.dump(user_info, json_file, indent=4)
                 cookies["logged_in"] = "true"
-                st.rerun()
+                Login_attempt = True
             else:
                 st.error("Incorrect username or password")
     with tab2:
@@ -104,3 +108,4 @@ if not st.session_state.get("logged_in", False):
             else:
                 st.error("Passwords do not match.")
 cookies.save()
+if Login_attempt: st.rerun()

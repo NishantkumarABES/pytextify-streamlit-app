@@ -1,10 +1,9 @@
 import streamlit as st
 st.set_page_config(layout="wide")
-
+from utility_functions import log_errors
 from cookies_file import cookies, init_session
-print("Loading cookies")
-init_session()
-print("Loading session")
+
+@log_errors
 def check_auth():
     user_session = cookies.get("session_id")
     if user_session and user_session in st.session_state.active_sessions:
@@ -23,13 +22,16 @@ chat = st.Page("reports/chat.py", title="Chats", icon=":material/chat:")
 search = st.Page("tools/pyimageify.py", title="PyImageify", icon=":material/search:")
 history = st.Page("tools/pydataify.py", title="PyDataify", icon=":material/history:")
 
+
+# Initialize session state
+session = init_session()
 user_data = check_auth()
 if user_data:
     st.session_state.logged_in = True
 else: st.session_state.logged_in = False
 
 
-if st.session_state.logged_in:
+if cookies.get("logged_in", "false") == "true":
     pg = st.navigation(
         {
             "Account": [profile_page, logout_page],
@@ -38,5 +40,4 @@ if st.session_state.logged_in:
         }
     )
 else: pg = st.navigation([login_page])
-
 pg.run()
